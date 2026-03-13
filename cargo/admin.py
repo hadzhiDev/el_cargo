@@ -21,6 +21,41 @@ class LoadAdmin(admin.ModelAdmin):
     readonly_fields = ('sent_to_client',)
     autocomplete_fields = ['client']
 
+    def save_model(self, request, obj, form, change):
+        if not change and obj.code:
+            lines = [line.strip() for line in obj.code.splitlines() if line.strip()]
+            obj.code = "\n".join(f"{i + 1}) {line}" for i, line in enumerate(lines))
+
+        super().save_model(request, obj, form, change)
+
+        if obj.sent_to_client:
+            self.message_user(
+                request,
+                "✅ Груз успешно отправлен клиенту в WhatsApp",
+                messages.SUCCESS
+            )
+
+        elif not obj.client:
+            self.message_user(
+                request,
+                "⚠️ Клиент не выбран. Сообщение не отправлено.",
+                messages.WARNING
+            )
+
+        elif not obj.client.wa_number:
+            self.message_user(
+                request,
+                "⚠️ У клиента нет номера WhatsApp.",
+                messages.WARNING
+            )
+
+        else:
+            self.message_user(
+                request,
+                "ℹ️ Сообщение не отправлено.",
+                messages.INFO
+            )
+
     @admin.action(description="📩 Отправить выбранные грузы в WhatsApp")
     def send_to_whatsapp(self, request, queryset):
         successful_count = 0
