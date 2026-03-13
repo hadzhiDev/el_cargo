@@ -54,7 +54,7 @@ class Client(models.Model):
         verbose_name_plural = 'Клиенты'
 
     name = models.CharField(max_length=300, null=True, blank=True)
-    code = models.CharField(max_length=200, verbose_name='код', blank=True, null=True)
+    code = models.CharField(max_length=200, verbose_name='код', unique=True, blank=True, null=True)
     wa_number = PhoneNumberField(max_length=100, unique=True, verbose_name='номер WhatsApp', blank=True, null=True)
 
     def __str__(self):
