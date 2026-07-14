@@ -1,0 +1,20 @@
+[Unit]
+Description=El Cargo Telegram Bot
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=root
+Group=root
+WorkingDirectory=/var/www/el_cargo/bot
+ExecStart=/var/www/el_cargo/bot/.venv/bin/python -u appp.py
+Restart=always
+RestartSec=5
+# journald captures stdout/stderr
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=el-cargo-bot
+
+[Install]
+WantedBy=multi-user.target
